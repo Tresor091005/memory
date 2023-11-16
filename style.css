@@ -101,6 +101,7 @@ footer {
 .card_face--back {
     background-color: #bb87ff;
     transform: rotateY(180deg); 
+    user-select: none;
 }
 
 .card_face--back.card--validate {
