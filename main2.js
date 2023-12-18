@@ -40,7 +40,58 @@ class cardPair {
 
     
 }
+class game {
+    constructor () {
+        this.symbol = ["1", "2", "3", "4", "5"]
+        this.main = createPairs(this.symbol)
 
+        this.main.forEach((pair) => {
+            pair.addPair()
+        })
+        
+        let cards = document.querySelectorAll('.card');
+        
+        cards.forEach((card) => {
+            card.addEventListener("click", () => {
+                card.classList.toggle("is-flipped");
+            });
+        });
+        
+        document.querySelector('body').addEventListener('click', () => {
+            this.main[0].isValidate()
+        })
+    }
+
+    log () {
+        console.log(this.main)
+    }
+}
+
+function randomElement(array) {
+    // renvoie un élément aléatoire d'un tableau
+    const randomClue = Math.floor(Math.random() * array.length)
+    return array[randomClue]
+}
+
+function createPairs(symbole) {
+    // Crée le tableau principal contenant les pairs
+    mainArray = []
+    alreadyUsed = []
+    do {
+        let element = randomElement(symbole)
+        if (!alreadyUsed.includes(element)) {
+            mainArray.push(new cardPair(element))
+            alreadyUsed.push(element)
+        }
+    } while (mainArray.length < 3)
+
+    return mainArray
+}
+
+let g = new game()
+
+
+/*
 let pair1 = new cardPair("1")
 let pair2 = new cardPair("2")
 let pair3 = new cardPair("3")
@@ -62,3 +113,5 @@ cards.forEach((card) => {
 document.querySelector('body').addEventListener('click', () => {
     pair1.isValidate()
 })
+
+*/
