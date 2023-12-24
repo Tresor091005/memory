@@ -42,7 +42,7 @@ class cardPair {
 }
 class game {
     constructor () {
-        this.symbol = ["1", "2", "3", "4", "5"]
+        this.symbol = ["👌", "😍", "😎", "😋", "😁"]
         this.main = createPairs(this.symbol)
 
         this.main.forEach((pair) => {
