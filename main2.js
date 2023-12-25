@@ -13,12 +13,20 @@ class cardElement {
         this.card = newCard
     }
 
-    add() {
+    add () {
         document.querySelector(".game").append(this.card)
     }
 
-    isOpen() {
+    isOpen () {
         return this.card.firstElementChild.classList.contains('is-flipped')
+    }
+
+    markFinish () {
+        this.card.firstElementChild.classList.add('card--validate')
+    }
+
+    markClose () {
+        this.card.firstElementChild.classList.remove('is-flipped')
     }
 }
 
@@ -26,44 +34,84 @@ class cardPair {
     constructor (name) {
         this.firstElement = new cardElement(name)
         this.secondElement = new cardElement(name)
+        this.elementList = [this.firstElement, this.secondElement]
     }
 
-    addPair() {
-        this.firstElement.add()
-        this.secondElement.add()
+    List() {
+        return this.elementList
     }
+
+    finish() {
+        this.firstElement.markFinish()
+        this.secondElement.markFinish()
+    }
+
+    close() {
+        this.firstElement.markClose()
+        this.secondElement.markClose()
+    } 
 
     isValidate() {
-        console.log(this.firstElement.isOpen() && this.secondElement.isOpen())
         return(this.firstElement.isOpen() && this.secondElement.isOpen())
     }
 
     
 }
+
 class game {
     constructor () {
         this.symbol = ["👌", "😍", "😎", "😋", "😁"]
-        this.main = createPairs(this.symbol)
+        this.main = createPairs(this.symbol)  // liste des pairs
+        this.gameElement = createElementList(this.main) // liste des éléments de chaque pair
 
-        this.main.forEach((pair) => {
+        /* this.main.forEach((pair) => {
             pair.addPair()
+        }) */
+
+        this.gameElement.forEach((element) => {
+            element.add()
         })
         
-        let cards = document.querySelectorAll('.card');
-        
-        cards.forEach((card) => {
-            card.addEventListener("click", () => {
-                card.classList.toggle("is-flipped");
-            });
-        });
-        
-        document.querySelector('body').addEventListener('click', () => {
+        /* document.querySelector('body').addEventListener('click', () => {
             this.main[0].isValidate()
-        })
+        }) */
     }
 
     log () {
         console.log(this.main)
+    }
+
+    rule() {
+        let n = 0
+        let cards = document.querySelectorAll('.card');
+
+        cards.forEach((card) => {
+            card.addEventListener("click", () => {
+                if (!card.classList.contains('is-flipped')) {
+                    card.classList.add("is-flipped");
+                    n++ 
+                    console.log(n)
+                }
+
+                if ((n%2) === 0) {
+                   this.main.forEach((pair) => {
+                    if (pair.isValidate()) {
+                        pair.finish()
+                    } else {
+                        setTimeout(() =>{
+                            pair.close()
+                        }, 500)
+                    }
+                   }) 
+                }
+
+                if (
+                    this.main[0].isValidate() && this.main[1].isValidate() && this.main[2].isValidate()
+                ) {
+                   console.log('fini')
+                }
+            });
+        });
     }
 }
 
@@ -88,7 +136,22 @@ function createPairs(symbole) {
     return mainArray
 }
 
+function createElementList(mainList) {
+    mainArray = []
+    alreadyUsed = []
+    do {
+        let element = randomElement(randomElement(mainList).List())
+        if (!alreadyUsed.includes(element)) {
+            mainArray.push(element)
+            alreadyUsed.push(element)
+        }
+    } while (mainArray.length < (mainList.length*2))
+
+    return mainArray
+}
+
 let g = new game()
+g.rule()
 
 
 /*

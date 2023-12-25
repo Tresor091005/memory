@@ -104,6 +104,6 @@ footer {
     user-select: none;
 }
 
-.card_face--back.card--validate {
+.card--validate > .card_face--back{
     background-color: #fbed2b;
 }
