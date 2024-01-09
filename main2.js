@@ -21,6 +21,10 @@ class cardElement {
         return this.card.firstElementChild.classList.contains('is-flipped')
     }
 
+    isCompleted () {
+        return this.card.firstElementChild.classList.contains('card--validate')
+    }
+
     markFinish () {
         this.card.firstElementChild.classList.add('card--validate')
     }
@@ -41,21 +45,49 @@ class cardPair {
         return this.elementList
     }
 
-    finish() {
-        this.firstElement.markFinish()
-        this.secondElement.markFinish()
-    }
-
-    close() {
-        this.firstElement.markClose()
-        this.secondElement.markClose()
-    } 
-
     isValidate() {
+        // les 2 sont ouverts
         return(this.firstElement.isOpen() && this.secondElement.isOpen())
     }
 
-    
+    onceOpen() {
+        // au moins 1 est ouvert
+        return(this.firstElement.isOpen() || this.secondElement.isOpen())
+    }
+
+    canBeClosed() {
+        // 1 uniquement est ouvert
+        if(!this.isValidate() && this.onceOpen()) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    isFinish() {
+        return(this.firstElement.isCompleted() && this.secondElement.isCompleted())
+    }
+
+    finish(o, length) {
+        this.firstElement.markFinish()
+        this.secondElement.markFinish()
+        if (o !== length) {
+            if (o%2 === 1) {
+                audio1.play()
+            } else {
+                audio2.play()
+            }
+            
+        }
+    }
+
+    close() {
+        audio3.play()
+        setTimeout(() =>{
+            this.firstElement.markClose()
+            this.secondElement.markClose()
+        }, 500)
+    }  
 }
 
 class game {
@@ -64,17 +96,9 @@ class game {
         this.main = createPairs(this.symbol)  // liste des pairs
         this.gameElement = createElementList(this.main) // liste des éléments de chaque pair
 
-        /* this.main.forEach((pair) => {
-            pair.addPair()
-        }) */
-
         this.gameElement.forEach((element) => {
             element.add()
         })
-        
-        /* document.querySelector('body').addEventListener('click', () => {
-            this.main[0].isValidate()
-        }) */
     }
 
     log () {
@@ -83,24 +107,28 @@ class game {
 
     rule() {
         let n = 0
-        let cards = document.querySelectorAll('.card');
+        let o = 0
+        let cards = document.querySelectorAll('.card')
 
         cards.forEach((card) => {
             card.addEventListener("click", () => {
                 if (!card.classList.contains('is-flipped')) {
-                    card.classList.add("is-flipped");
+                    card.classList.add("is-flipped")
                     n++ 
                     console.log(n)
+                } else {
+                    audio4.play()
                 }
 
                 if ((n%2) === 0) {
                    this.main.forEach((pair) => {
-                    if (pair.isValidate()) {
-                        pair.finish()
-                    } else {
-                        setTimeout(() =>{
-                            pair.close()
-                        }, 500)
+                    if (pair.isValidate() && !pair.isFinish()) {
+                        o++
+                        pair.finish(o, this.main.length)
+                    } else if (pair.isValidate() && pair.isFinish()) {
+                        //rien
+                    } else if (pair.canBeClosed()) {
+                        pair.close()                     
                     }
                    }) 
                 }
@@ -108,7 +136,8 @@ class game {
                 if (
                     this.main[0].isValidate() && this.main[1].isValidate() && this.main[2].isValidate()
                 ) {
-                   console.log('fini')
+                    let temps = '19'
+                    window.location.href = 'win.html?n=' + n + '&temps=' + temps
                 }
             });
         });
@@ -150,31 +179,10 @@ function createElementList(mainList) {
     return mainArray
 }
 
+const audio1 = document.getElementById("instant-win1")
+const audio2 = document.getElementById("instant-win2")
+const audio3 = document.getElementById("instant-warn")
+const audio4 = document.getElementById("instant-warn2")
+
 let g = new game()
 g.rule()
-
-
-/*
-let pair1 = new cardPair("1")
-let pair2 = new cardPair("2")
-let pair3 = new cardPair("3")
-
-allPairs = [pair1, pair2, pair3]
-
-allPairs.forEach((pair) => {
-    pair.addPair()
-})
-
-let cards = document.querySelectorAll('.card');
-
-cards.forEach((card) => {
-    card.addEventListener("click", () => {
-        card.classList.toggle("is-flipped");
-    });
-});
-
-document.querySelector('body').addEventListener('click', () => {
-    pair1.isValidate()
-})
-
-*/
